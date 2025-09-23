@@ -3,60 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Rekam Medis Sederhana</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Data Dokter</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="style-dashboard.css">
 </head>
 <body>
 
-    <section id="login-section">
-        <div class="container">
-            <h1>Login Staf Medis</h1>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p id="login-error" class="error-message"></p>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading text-white">Aplikasi Rekam Medis</div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-injured me-2"></i>Data Pasien</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white active"><i class="fas fa-user-md me-2"></i>Data Dokter</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-pills me-2"></i>Data Obat</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-file-medical me-2"></i>Data Rekam Medis</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-chart-bar me-2"></i>Data Laporan</a>
+            </div>
         </div>
-    </section>
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user me-2"></i>Admin
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Profil</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-    <main id="app-section" class="hidden">
-        <header>
-            <div class="container">
-                <h1>Dashboard Rekam Medis</h1>
-                <button id="logout-button">Logout</button>
-            </div>
-        </header>
-
-        <section id="add-patient-section">
-            <div class="container">
-                <h2>Tambah Pasien Baru</h2>
-                <form id="add-patient-form">
-                    <input type="text" id="nama-pasien" placeholder="Nama Lengkap Pasien" required>
-                    <input type="date" id="tgl-lahir-pasien" required>
-                    <input type="text" id="alamat-pasien" placeholder="Alamat" required>
-                    <textarea id="riwayat-medis" placeholder="Catatan Riwayat Medis"></textarea>
-                    <button type="submit">Simpan Data Pasien</button>
-                </form>
-            </div>
-        </section>
-
-        <section id="patient-list-section">
-            <div class="container">
-                <h2>Daftar Pasien</h2>
-                <div id="patient-list">
+            <div class="container-fluid p-4">
+                <h1 class="mt-4"><i class="fas fa-user-md me-2"></i>Data Dokter</h1>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <button class="btn btn-success"><i class="fas fa-plus me-2"></i>Tambah Data</button>
                     </div>
+                    <div class="card-body">
+                        <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Dokter</th>
+                                    <th>Spesialis</th>
+                                    <th>Email</th>
+                                    <th>No Telp</th>
+                                    <th>Alamat</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </section>
-    </main>
+        </div>
+        </div>
 
-        <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <script src="script.js"></script>
-    
-
+    <script src="script-dashboard.js"></script>
 </body>
-  </html>
-  
+</html>
