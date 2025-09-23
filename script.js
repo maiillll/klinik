@@ -1,10 +1,4 @@
-// Konfigurasi Firebase Anda (salin dari konsol Firebase)
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// GANTI DENGAN KONFIGURASI ANDA YANG BENAR
 const firebaseConfig = {
   apiKey: "AIzaSyAr9-ZC-Po3e-dH3WPAmc7fEXZ7peEtSN8",
   authDomain: "klinik-26f61.firebaseapp.com",
@@ -14,10 +8,7 @@ const firebaseConfig = {
   appId: "1:388091198852:web:11401553ab9bd4b1bb71d1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Inisialisasi Firebase
+// Inisialisasi Firebase DENGAN GAYA LAMA (COMPAT)
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -53,7 +44,7 @@ auth.onAuthStateChanged(user => {
         // Pengguna sudah login, tampilkan aplikasi
         loginSection.classList.add('hidden');
         appSection.classList.remove('hidden');
-        loadPatients(); // Muat data pasien setelah login berhasil
+        loadPatients(); 
     } else {
         // Pengguna belum login, tampilkan halaman login
         loginSection.classList.remove('hidden');
@@ -90,11 +81,11 @@ addPatientForm.addEventListener('submit', (e) => {
         tanggalLahir: tglLahirPasien.value,
         alamat: alamatPasien.value,
         riwayat: riwayatMedis.value,
-        dibuatPada: firebase.firestore.FieldValue.serverTimestamp() // Tambah timestamp
+        dibuatPada: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then(() => {
         console.log("Data pasien berhasil ditambahkan!");
-        addPatientForm.reset(); // Kosongkan form setelah submit
+        addPatientForm.reset();
     })
     .catch(error => {
         console.error("Error menambahkan pasien: ", error);
@@ -120,3 +111,4 @@ function loadPatients() {
         patientList.innerHTML = html;
     });
 }
+
