@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Rekam Medis Sederhana</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section id="login-section">
+        <div class="container">
+            <h1>Login Staf Medis</h1>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p id="login-error" class="error-message"></p>
+        </div>
+    </section>
+
+    <main id="app-section" class="hidden">
+        <header>
+            <div class="container">
+                <h1>Dashboard Rekam Medis</h1>
+                <button id="logout-button">Logout</button>
+            </div>
+        </header>
+
+        <section id="add-patient-section">
+            <div class="container">
+                <h2>Tambah Pasien Baru</h2>
+                <form id="add-patient-form">
+                    <input type="text" id="nama-pasien" placeholder="Nama Lengkap Pasien" required>
+                    <input type="date" id="tgl-lahir-pasien" required>
+                    <input type="text" id="alamat-pasien" placeholder="Alamat" required>
+                    <textarea id="riwayat-medis" placeholder="Catatan Riwayat Medis"></textarea>
+                    <button type="submit">Simpan Data Pasien</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="patient-list-section">
+            <div class="container">
+                <h2>Daftar Pasien</h2>
+                <div id="patient-list">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+  </html>
+  
