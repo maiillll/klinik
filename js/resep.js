@@ -127,18 +127,21 @@ $(document).ready(function() {
         // 1. Simpan data tagihan ke Firestore
         db.collection('bills').add(tagihanData).then(docRef => {
             
-            // 2. Siapkan data untuk dikirim ke backend Pipedream
+            // 2. Siapkan data untuk dikirim ke backend Google Apps Script
             const requestDataToBackend = {
                 order_id: docRef.id,
                 gross_amount: tagihanData.total
             };
 
-            // 3. Panggil backend Pipedream Anda
-            const pipedreamUrl = "https://eogv8o8hgcb7rg8.m.pipedream.net"; // URL PIPEDREAM BARU ANDA SUDAH DIMASUKKAN DI SINI
+            // 3. Panggil backend Google Apps Script Anda
+            const backendUrl = "https://script.google.com/macros/s/AKfycbw87cVZ6_CVG5J1W0u7_px3OQ8y0Hl78eyVWJS2ieg9o2ifpso2ysJJkMbnMhll__PVuw/exec"; // URL GOOGLE APPS SCRIPT ANDA SUDAH DIMASUKKAN
             
-            fetch(pipedreamUrl, {
+            fetch(backendUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                redirect: 'follow', // Penting untuk Google Apps Script
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
                 body: JSON.stringify(requestDataToBackend)
             })
             .then(response => response.json())
@@ -162,7 +165,7 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    alert('Gagal mendapatkan token pembayaran dari server.');
+                    alert('Gagal mendapatkan token dari server: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
