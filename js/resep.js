@@ -134,7 +134,7 @@ $(document).ready(function() {
             };
 
             // 3. Panggil backend Pipedream Anda
-            const pipedreamUrl = "https://eo7c1gbo1c2imf7.m.pipedream.net"; // URL PIPEDREAM ANDA SUDAH DI SINI
+            const pipedreamUrl = "https://eogv8o8hgcb7rg8.m.pipedream.net"; // URL PIPEDREAM BARU ANDA SUDAH DIMASUKKAN DI SINI
             
             fetch(pipedreamUrl, {
                 method: 'POST',
@@ -152,6 +152,7 @@ $(document).ready(function() {
                             window.location.href = 'pembayaran.html';
                         },
                         onPending: function(result) {
+                            db.collection('bills').doc(docRef.id).update({ status: 'PENDING' });
                             alert("Menunggu pembayaran!");
                             window.location.href = 'pembayaran.html';
                         },
@@ -175,4 +176,3 @@ $(document).ready(function() {
         });
     });
 });
-                
