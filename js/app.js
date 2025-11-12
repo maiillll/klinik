@@ -6,9 +6,12 @@ $(document).ready(function() {
     });
 
     // Menandai menu aktif berdasarkan halaman
-    const currentPage = window.location.pathname.split("/").pop();
-    if (currentPage === 'index.html' || currentPage === '') {
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    if (currentPage === 'index.html') {
         $('#nav-pasien').addClass('active');
+    } else if (currentPage === 'antrian.html') {
+        // INI ADALAH BARIS YANG DITAMBAHKAN
+        $('#nav-antrian').addClass('active');
     } else if (currentPage === 'tindakan.html') {
         $('#nav-tindakan').addClass('active');
     } else if (currentPage === 'obat.html') {
