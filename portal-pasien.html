@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pasien - Klinik Sehat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .portal-container { max-width: 600px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Portal Pasien Klinik Sehat</span>
+            <button class="btn btn-outline-light" id="btnLogout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container portal-container mt-5">
+        <div class="card p-4 shadow-sm">
+            <h4 id="welcomeMessage">Memuat...</h4>
+            <hr>
+            
+            <div id="loading" class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div id="ambilAntrianSection" class="d-none">
+                <h5>Ambil Nomor Antrian</h5>
+                <div class="mb-3">
+                    <label for="tanggalAntrian" class="form-label">Pilih Tanggal</label>
+                    <input type="date" class="form-control" id="tanggalAntrian">
+                </div>
+                <button class="btn btn-primary w-100" id="btnAmbilNomor">Ambil Nomor Antrian</button>
+                <p id="ambilError" class="text-danger mt-2"></p>
+            </div>
+
+            <div id="infoAntrianSection" class="d-none text-center">
+                <h5 id="infoTanggal">Anda sudah memiliki nomor antrian untuk tanggal...</h5>
+                <div class="alert alert-success mt-3">
+                    <h3>Nomor Antrian Anda</h3>
+                    <h1 class="display-1" id="nomorAntrian">0</h1>
+                    <p class="mb-0" id="statusAntrian">Status: Menunggu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="js/config.js"></script>
+    
+    <script>
+        const auth = firebase.auth();
+        let currentUser = null;
+        let patientData = null;
+
+        $(document).ready(function() {
+            // Set tanggal minimal hari ini
+            $('#tanggalAntrian').attr('min', new Date().toISOString().slice(0, 10));
+            $('#tanggalAntrian').val(new Date().toISOString().slice(0, 10));
+
+            // Cek status login
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    // Ambil data pasien dari Firestore
+                    db.collection('patients').doc(user.uid).get().then(doc => {
+                        if (doc.exists) {
+                            patientData = doc.data();
+                            $('#welcomeMessage').text(`Halo, ${patientData.nama}!`);
+                            // Cek apakah pasien sudah punya antrian hari ini
+                            cekAntrian(new Date().toISOString().slice(0, 10));
+                        } else {
+                            // Data pasien tidak ada, paksa logout
+                            auth.signOut();
+                        }
+                    });
+                } else {
+                    window.location.href = 'login-pasien.html';
+                }
+            });
+
+            // Tombol Logout
+            $('#btnLogout').on('click', () => {
+                auth.signOut();
+            });
+
+            // Tombol Ambil Nomor
+            $('#btnAmbilNomor').on('click', ambilNomorBaru);
+            
+            // Cek antrian saat tanggal berubah
+            $('#tanggalAntrian').on('change', function() {
+                cekAntrian($(this).val());
+            });
+        });
+
+        async function cekAntrian(tanggal) {
+            if (!currentUser) return;
+            $('#loading').removeClass('d-none');
+            $('#ambilAntrianSection, #infoAntrianSection').addClass('d-none');
+            $('#ambilError').text('');
+
+            // Cek apakah pasien sudah punya antrian di tanggal ini
+            const snapshot = await db.collection('queue')
+                                     .where('patientId', '==', currentUser.uid)
+                                     .where('queueDate', '==', tanggal)
+                                     .limit(1)
+                                     .get();
+            
+            $('#loading').addClass('d-none');
+            if (snapshot.empty) {
+                // Belum punya antrian, tampilkan form ambil nomor
+                $('#ambilAntrianSection').removeClass('d-none');
+            } else {
+                // Sudah punya antrian, tampilkan nomor
+                const antrian = snapshot.docs[0].data();
+                $('#infoTanggal').text(`Nomor antrian Anda untuk tanggal ${tanggal}:`);
+                $('#nomorAntrian').text(antrian.queueNumber);
+                $('#statusAntrian').text(`Status: ${antrian.status}`);
+                $('#infoAntrianSection').removeClass('d-none');
+            }
+        }
+
+        async function ambilNomorBaru() {
+            const tanggal = $('#tanggalAntrian').val();
+            if (!tanggal) {
+                $('#ambilError').text('Silakan pilih tanggal terlebih dahulu.');
+                return;
+            }
+
+            $('#btnAmbilNomor').prop('disabled', true).text('Memproses...');
+
+            try {
+                // 1. Cek lagi (antisipasi double click)
+                const cekSnapshot = await db.collection('queue')
+                                            .where('patientId', '==', currentUser.uid)
+                                            .where('queueDate', '==', tanggal)
+                                            .limit(1)
+                                            .get();
+                if (!cekSnapshot.empty) {
+                    alert("Anda sudah mengambil nomor untuk tanggal ini.");
+                    cekAntrian(tanggal); // Tampilkan info antrian
+                    return;
+                }
+
+                // 2. Dapatkan nomor antrian terakhir di tanggal tersebut
+                const queueQuery = await db.collection('queue')
+                                           .where('queueDate', '==', tanggal)
+                                           .orderBy('queueNumber', 'desc')
+                                           .limit(1)
+                                           .get();
+
+                let newQueueNumber = 1;
+                if (!queueQuery.empty) {
+                    newQueueNumber = queueQuery.docs[0].data().queueNumber + 1;
+                }
+
+                // 3. Simpan data antrian baru
+                await db.collection('queue').add({
+                    patientId: currentUser.uid,
+                    patientName: patientData.nama,
+                    queueNumber: newQueueNumber,
+                    queueDate: tanggal,
+                    status: 'Menunggu',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // 4. Tampilkan info antrian
+                cekAntrian(tanggal);
+
+            } catch (error) {
+                console.error("Error ambil nomor: ", error);
+                $('#ambilError').text('Gagal mengambil nomor. Coba lagi.');
+            } finally {
+                $('#btnAmbilNomor').prop('disabled', false).text('Ambil Nomor Antrian');
+            }
+        }
+    </script>
+</body>
+</html>
